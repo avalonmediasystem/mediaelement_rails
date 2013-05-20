@@ -8,6 +8,7 @@ module MediaelementRails
     UPDATE_FILES = {
       "mediaelement.js"        => "javascripts",
       "mediaelementplayer.js"  => "javascripts",
+      "mediaelement-and-player.js"  => "javascripts",
       "mediaelementplayer.css" => "stylesheets",
       "mejs-skins.css"         => "stylesheets",
       "*.{svg,png,gif}"        => "images",
