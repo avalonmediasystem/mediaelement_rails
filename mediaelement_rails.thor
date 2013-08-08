@@ -35,7 +35,7 @@ module MediaelementRails
       :aliases => %w(-a)
     method_option "git",
       :desc    => "URL of the MediaElement.js git repo to clone",
-      :default => "http://github.com/phuongdh/mediaelement.git",
+      :default => "http://github.com/avalonmediasystem/mediaelement.git",
       :aliases => %w(-g)
     method_option "tag",
       :desc    => "The tag to checkout in the MediaElement.js git repo",
@@ -47,8 +47,9 @@ module MediaelementRails
       
       # Update the vendored MediaElement.js
       run "git clone #{options[:git]} #{vendor_path}",    :capture => true unless File.directory? vendor_path
-      run "cd #{vendor_path} && git pull origin #{options[:tag]}",  :capture => true
+      run "cd #{vendor_path} && git fetch",  :capture => true
       run "cd #{vendor_path} && git checkout #{options[:tag]}", :capture => true
+      run "cd #{vendor_path} && git pull origin #{options[:tag]}",  :capture => true
       
       # Then copy the files we need to their correct locations
       UPDATE_FILES.each do |matcher, path|
