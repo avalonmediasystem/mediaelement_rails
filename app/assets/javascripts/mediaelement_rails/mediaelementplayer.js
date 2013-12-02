@@ -1894,10 +1894,13 @@ if (typeof jQuery != 'undefined') {
 
 					fullscreenBtn.click(function() {
 						var isFullScreen = (mejs.MediaFeatures.hasTrueNativeFullScreen && mejs.MediaFeatures.isFullScreen()) || player.isFullScreen;
-
 						if (isFullScreen) {
 							player.exitFullScreen();
 						} else {
+							// On iPad, fullscreen is not possible before loading
+							if (t.media.readyState == 0) {
+								t.load();
+							}
 							player.enterFullScreen();
 						}
 					});
