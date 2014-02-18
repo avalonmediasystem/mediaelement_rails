@@ -665,7 +665,7 @@ mejs.PluginMediaElement.prototype = {
 	},
 
 	setCurrentTime: function (time) {
-		if (this.pluginApi != null) {
+		if (this.pluginApi != null && (!this.duration | time <= this.duration)) {
 			if (this.pluginType == 'youtube') {
 				this.pluginApi.seekTo(time);
 			} else {
@@ -3462,7 +3462,7 @@ if (typeof jQuery != 'undefined') {
 
 			var t = this;
 		
-			if (t.media.currentTime != undefined && t.media.duration) {
+			if (t.media.currentTime != undefined && t.media.duration && t.media.currentTime <= t.media.duration) {
 
 				// update bar and handle
 				if (t.total && t.handle) {
