@@ -679,6 +679,11 @@ if (typeof jQuery != 'undefined') {
 				t.media.addEventListener('ended', function (e) {
 					if(t.options.autoRewind) {
 						try{
+							// Android 4 HLS
+							if (mejs.MediaFeatures.isAndroid4) {
+								t.media.play();
+							}
+
 							t.media.setCurrentTime(0);
 						} catch (exp) {
 
@@ -885,7 +890,7 @@ if (typeof jQuery != 'undefined') {
 				});
 
 				// fit the rail into the remaining space
-				railWidth = t.controls.width() - usedWidth - (rail.outerWidth(true) - rail.width());
+				railWidth = t.controls.width() - usedWidth - (rail.outerWidth(true) - rail.width()) - 2;
 			}
 
 			// outer area

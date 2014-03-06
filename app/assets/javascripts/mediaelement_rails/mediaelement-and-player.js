@@ -316,6 +316,7 @@ mejs.MediaFeatures = {
 		t.isiPhone = (ua.match(/iphone/i) !== null);
 		t.isiOS = t.isiPhone || t.isiPad;
 		t.isAndroid = (ua.match(/android/i) !== null);
+		t.isAndroid4 = (ua.match(/android 4/i) !== null);
 		t.isBustedAndroid = (ua.match(/android 2\.[12]/) !== null);
 		t.isBustedNativeHTTPS = (location.protocol === 'https:' && (ua.match(/android [12]\./) !== null || ua.match(/macintosh.* version.* safari/) !== null));
 		t.isIE = (nav.appName.toLowerCase().match(/trident/gi) !== null) | (nav.appName.toLowerCase().indexOf("microsoft") != -1);
@@ -1080,7 +1081,9 @@ mejs.HtmlMediaElementShim = {
 				// normal check
 				if (htmlMediaElement.canPlayType(mediaFiles[i].type).replace(/no/, '') !== '' 
 					// special case for Mac/Safari 5.0.3 which answers '' to canPlayType('audio/mp3') but 'maybe' to canPlayType('audio/mpeg')
-					|| htmlMediaElement.canPlayType(mediaFiles[i].type.replace(/mp3/,'mpeg')).replace(/no/, '') !== '') {
+					|| htmlMediaElement.canPlayType(mediaFiles[i].type.replace(/mp3/,'mpeg')).replace(/no/, '') !== ''
+					// special case for Android 4.x.x, whose canPlayType HLS usually return ''
+					|| (mejs.MediaFeatures.isAndroid4 && mediaFiles[i].type.indexOf("vnd.apple.mpegURL")) != -1) {
 					result.method = 'native';
 					result.url = mediaFiles[i].url;
 					break;
@@ -2641,6 +2644,11 @@ if (typeof jQuery != 'undefined') {
 				t.media.addEventListener('ended', function (e) {
 					if(t.options.autoRewind) {
 						try{
+							// Android 4 HLS
+							if (mejs.MediaFeatures.isAndroid4) {
+								t.media.play();
+							}
+
 							t.media.setCurrentTime(0);
 						} catch (exp) {
 
@@ -2847,7 +2855,7 @@ if (typeof jQuery != 'undefined') {
 				});
 
 				// fit the rail into the remaining space
-				railWidth = t.controls.width() - usedWidth - (rail.outerWidth(true) - rail.width());
+				railWidth = t.controls.width() - usedWidth - (rail.outerWidth(true) - rail.width()) - 2;
 			}
 
 			// outer area
