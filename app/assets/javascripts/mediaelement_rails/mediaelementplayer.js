@@ -951,8 +951,13 @@ if (typeof jQuery != 'undefined') {
 
 			posterImg.attr('src', url);
 			posterDiv.css({'background-image' : 'url(' + url + ')'});
-      // HTML5 player gets the poster from here so we need to update it when changing the poster
-      this.$media.attr('poster', url);
+
+			// HTML5 player gets the poster from here so we need to update it when changing the poster
+			if (mejs.MediaFeatures.isAndroid) {
+				this.$media.removeAttr('poster');
+			} else {
+				this.$media.attr('poster', url);
+			}
 		},
 
 		buildoverlays: function(player, controls, layers, media) {
