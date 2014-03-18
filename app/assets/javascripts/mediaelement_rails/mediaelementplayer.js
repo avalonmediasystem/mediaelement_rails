@@ -929,13 +929,25 @@ if (typeof jQuery != 'undefined') {
 			// since the <video> element is being "hidden"
 			if (!mejs.MediaFeatures.isiPhone) {
 			        media.addEventListener('play',function() {
-			                 poster.hide();
-			        }, false);
+			 		if (mejs.MediaFeatures.isAndroid) {
+                                               poster.hide("fast", function() {
+                                                       media.removeAttribute('poster');
+                                               });
+                                        } else {
+                                               poster.hide();
+                                        }
+			       }, false);
 			}
 
 			if(player.options.showPosterWhenEnded && player.options.autoRewind){
 				media.addEventListener('ended',function() {
-					poster.show();
+			 		if (mejs.MediaFeatures.isAndroid) {
+                                               poster.show("fast", function() {
+                                                       media.setAttribute('poster', posterUrl);
+                                               });
+                                        } else {
+					       poster.show();
+                                        }
 				}, false);
 			}
 		},
@@ -953,11 +965,7 @@ if (typeof jQuery != 'undefined') {
 			posterDiv.css({'background-image' : 'url(' + url + ')'});
 
 			// HTML5 player gets the poster from here so we need to update it when changing the poster
-			if (mejs.MediaFeatures.isAndroid) {
-				this.$media.removeAttr('poster');
-			} else {
-				this.$media.attr('poster', url);
-			}
+			this.$media.attr('poster', url);
 		},
 
 		buildoverlays: function(player, controls, layers, media) {
