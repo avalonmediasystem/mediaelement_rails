@@ -738,10 +738,12 @@ if (typeof jQuery != 'undefined') {
 
 				// adjust controls whenever window sizes (used to be in fullscreen only)
 				t.globalBind('resize', function() {
-
-					// don't resize for fullscreen mode
-					if ( !(t.isFullScreen || (mejs.MediaFeatures.hasTrueNativeFullScreen && document.webkitIsFullScreen)) ) {
-						t.setPlayerSize(t.width, t.height);
+					// don't resize inside a frame/iframe
+					if (window.top == window.self) {
+						// don't resize for fullscreen mode
+						if ( !(t.isFullScreen || (mejs.MediaFeatures.hasTrueNativeFullScreen && document.webkitIsFullScreen)) ) {
+							t.setPlayerSize(t.width, t.height);
+						}
 					}
 
 					// always adjust controls
