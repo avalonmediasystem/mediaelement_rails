@@ -1467,12 +1467,12 @@ if (typeof jQuery != 'undefined') {
 			// loading
 			media.addEventListener('progress', function (e) {
 				player.setProgressRail(e);
-				player.setCurrentRail(e);
+//				player.setCurrentRail(e);
 			}, false);
 
 			// current time
 			media.addEventListener('timeupdate', function(e) {
-				player.setProgressRail(e);
+//				player.setProgressRail(e);
 				player.setCurrentRail(e);
 			}, false);
 			
