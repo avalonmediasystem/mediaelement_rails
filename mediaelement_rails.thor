@@ -9,8 +9,8 @@ module MediaelementRails
       "mediaelement.js"        => "javascripts",
       "mediaelementplayer.js"  => "javascripts",
       "mediaelement-and-player.js"  => "javascripts",
-      "mediaelementplayer.css" => "stylesheets",
-      "mejs-skins.css"         => "stylesheets",
+#      "mediaelementplayer.css" => "stylesheets",
+#      "mejs-skins.css"         => "stylesheets",
       "*.{svg,png,gif}"        => "images",
       "*.{swf,xap}"            => "plugins"
     }
@@ -50,6 +50,7 @@ module MediaelementRails
       run "cd #{vendor_path} && git fetch",  :capture => true
       run "cd #{vendor_path} && git checkout #{options[:tag]}", :capture => true
       run "cd #{vendor_path} && git pull origin #{options[:tag]}",  :capture => true
+      run "cd #{vendor_path}/src && python Builder.py", :capture => true
       
       # Then copy the files we need to their correct locations
       UPDATE_FILES.each do |matcher, path|

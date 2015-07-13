@@ -2374,7 +2374,10 @@ if (typeof jQuery != 'undefined') {
 
 			doAnimation = typeof doAnimation == 'undefined' || doAnimation;
 
-			if (!t.controlsAreVisible || t.options.alwaysShowControls)
+      focusedElement = document.activeElement;
+      controlIsFocused = $.contains( t.controls.get( 0 ), focusedElement );
+
+			if (!t.controlsAreVisible || t.options.alwaysShowControls || controlIsFocused)
 				return;
 
 			if (doAnimation) {
@@ -3432,12 +3435,12 @@ if (typeof jQuery != 'undefined') {
 			// loading
 			media.addEventListener('progress', function (e) {
 				player.setProgressRail(e);
-				player.setCurrentRail(e);
+//				player.setCurrentRail(e);
 			}, false);
 
 			// current time
 			media.addEventListener('timeupdate', function(e) {
-				player.setProgressRail(e);
+//				player.setProgressRail(e);
 				player.setCurrentRail(e);
 			}, false);
 			
