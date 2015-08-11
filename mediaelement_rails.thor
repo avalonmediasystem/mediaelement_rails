@@ -39,7 +39,7 @@ module MediaelementRails
       :aliases => %w(-g)
     method_option "tag",
       :desc    => "The tag to checkout in the MediaElement.js git repo",
-      :default => "flex_build",
+      :default => "avalon",
       :aliases => %w(-t)
     def update
       assets_path = options[:assets_path]
