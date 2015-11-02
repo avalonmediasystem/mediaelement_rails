@@ -1083,7 +1083,7 @@ mejs.HtmlMediaElementShim = {
 					// special case for Mac/Safari 5.0.3 which answers '' to canPlayType('audio/mp3') but 'maybe' to canPlayType('audio/mpeg')
 					|| htmlMediaElement.canPlayType(mediaFiles[i].type.replace(/mp3/,'mpeg')).replace(/no/, '') !== ''
 					// special case for Android 4.x.x, whose canPlayType HLS usually return ''
-				        || (mejs.MediaFeatures.isAndroid4 && mediaFiles[i].type.indexOf("vnd.apple.mpegURL") != -1 )) {
+					|| (mejs.MediaFeatures.isAndroid4 && mediaFiles[i].type.indexOf("vnd.apple.mpegURL")) != -1) {
 					result.method = 'native';
 					result.url = mediaFiles[i].url;
 					break;
@@ -2374,10 +2374,7 @@ if (typeof jQuery != 'undefined') {
 
 			doAnimation = typeof doAnimation == 'undefined' || doAnimation;
 
-			focusedElement = document.activeElement;
-			controlIsFocused = $.contains( t.controls.get( 0 ), focusedElement );
-
-			if (!t.controlsAreVisible || t.options.alwaysShowControls || controlIsFocused)
+			if (!t.controlsAreVisible || t.options.alwaysShowControls)
 				return;
 
 			if (doAnimation) {
@@ -3009,8 +3006,6 @@ if (typeof jQuery != 'undefined') {
 
 			media.addEventListener('seeked', function() {
 				loading.hide();
-				if (!mejs.MediaFeatures.isiPhone && t.getCurrentTime() > 0 && $('.mejs-poster').is(':visible'))
-					$('.mejs-poster').hide();
 				controls.find('.mejs-time-buffering').hide();
 			}, false);
 
@@ -3437,12 +3432,12 @@ if (typeof jQuery != 'undefined') {
 			// loading
 			media.addEventListener('progress', function (e) {
 				player.setProgressRail(e);
-				player.setCurrentRail(e);
+//				player.setCurrentRail(e);
 			}, false);
 
 			// current time
 			media.addEventListener('timeupdate', function(e) {
-				player.setProgressRail(e);
+//				player.setProgressRail(e);
 				player.setCurrentRail(e);
 			}, false);
 			

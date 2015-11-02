@@ -409,10 +409,7 @@ if (typeof jQuery != 'undefined') {
 
 			doAnimation = typeof doAnimation == 'undefined' || doAnimation;
 
-			focusedElement = document.activeElement;
-			controlIsFocused = $.contains( t.controls.get( 0 ), focusedElement );
-
-			if (!t.controlsAreVisible || t.options.alwaysShowControls || controlIsFocused)
+			if (!t.controlsAreVisible || t.options.alwaysShowControls)
 				return;
 
 			if (doAnimation) {
@@ -1044,8 +1041,6 @@ if (typeof jQuery != 'undefined') {
 
 			media.addEventListener('seeked', function() {
 				loading.hide();
-				if (!mejs.MediaFeatures.isiPhone && t.getCurrentTime() > 0 && $('.mejs-poster').is(':visible'))
-					$('.mejs-poster').hide();
 				controls.find('.mejs-time-buffering').hide();
 			}, false);
 
@@ -1472,12 +1467,12 @@ if (typeof jQuery != 'undefined') {
 			// loading
 			media.addEventListener('progress', function (e) {
 				player.setProgressRail(e);
-				player.setCurrentRail(e);
+//				player.setCurrentRail(e);
 			}, false);
 
 			// current time
 			media.addEventListener('timeupdate', function(e) {
-				player.setProgressRail(e);
+//				player.setProgressRail(e);
 				player.setCurrentRail(e);
 			}, false);
 			
