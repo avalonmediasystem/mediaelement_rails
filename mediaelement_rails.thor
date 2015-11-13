@@ -11,7 +11,7 @@ module MediaelementRails
       "mediaelement-and-player.js"  => "javascripts",
 #      "mediaelementplayer.css" => "stylesheets",
 #      "mejs-skins.css"         => "stylesheets",
-      "*.{svg,png,gif}"        => "images",
+#      "*.{svg,png,gif}"        => "images",
       "flashelement.swf"       => "plugins"
 #     "*.{swf,xap}"            => "plugins"
     }
