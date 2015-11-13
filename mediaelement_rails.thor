@@ -12,11 +12,12 @@ module MediaelementRails
 #      "mediaelementplayer.css" => "stylesheets",
 #      "mejs-skins.css"         => "stylesheets",
       "*.{svg,png,gif}"        => "images",
-      "*.{swf,xap}"            => "plugins"
+      "flashelement.swf"       => "plugins"
+#     "*.{swf,xap}"            => "plugins"
     }
     
     TRANSFORMATIONS = {
-      "**/*.css.erb" => :add_asset_path_helper,
+#      "**/*.css.erb" => :add_asset_path_helper,
       "**/*.js"      => :remove_weird_characters
     }
     
@@ -35,11 +36,11 @@ module MediaelementRails
       :aliases => %w(-a)
     method_option "git",
       :desc    => "URL of the MediaElement.js git repo to clone",
-      :default => "http://github.com/avalonmediasystem/mediaelement.git",
+      :default => "https://github.com/avalonmediasystem/mediaelement.git",
       :aliases => %w(-g)
     method_option "tag",
       :desc    => "The tag to checkout in the MediaElement.js git repo",
-      :default => "avalon",
+      :default => "master",
       :aliases => %w(-t)
     def update
       assets_path = options[:assets_path]
@@ -49,6 +50,7 @@ module MediaelementRails
       run "git clone #{options[:git]} #{vendor_path}",    :capture => true unless File.directory? vendor_path
       run "cd #{vendor_path} && git fetch",  :capture => true
       run "cd #{vendor_path} && git checkout #{options[:tag]}", :capture => true
+      run "cd #{vendor_path} && git reset --hard origin/#{options[:tag]}",  :capture => true
       run "cd #{vendor_path} && git pull origin #{options[:tag]}",  :capture => true
       run "cd #{vendor_path}/src && python Builder.py", :capture => true
       
