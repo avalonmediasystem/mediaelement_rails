@@ -2210,7 +2210,7 @@ if (typeof jQuery != 'undefined') {
 			});
 
             //Keyboard input
-            mute.find('button').bind('focus', function () {
+      mute.find('button').bind('focus', function () {
 				volumeSlider.show();
 			});
 
