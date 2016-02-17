@@ -17,7 +17,7 @@ module MediaelementRails
     }
 
     TRANSFORMATIONS = {
-#      "**/*.css.erb" => :add_asset_path_helper,
+      "**/*.css.erb" => :add_asset_path_helper,
       "**/*.js"      => :remove_weird_characters
     }
 
@@ -56,7 +56,7 @@ module MediaelementRails
 
       # Then copy the files we need to their correct locations
       UPDATE_FILES.each do |matcher, path|
-        Dir[File.join(vendor_path, "local-build", matcher)].each do |file|
+        Dir[File.join(vendor_path, "build", matcher)].each do |file|
           new_name = File.join assets_path, path, "mediaelement_rails", File.basename(file)
           new_name << ".erb" if file =~ /\.css$/
           copy_file file, new_name
