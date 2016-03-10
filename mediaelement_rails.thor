@@ -17,7 +17,7 @@ module MediaelementRails
     }
 
     TRANSFORMATIONS = {
-#      "**/*.css.erb" => :add_asset_path_helper,
+      "**/*.css.erb" => :add_asset_path_helper,
       "**/*.js"      => :remove_weird_characters
     }
 
@@ -40,7 +40,7 @@ module MediaelementRails
       :aliases => %w(-g)
     method_option "tag",
       :desc    => "The tag to checkout in the MediaElement.js git repo",
-      :default => "master",
+      :default => "captions",
       :aliases => %w(-t)
     def update
       assets_path = options[:assets_path]

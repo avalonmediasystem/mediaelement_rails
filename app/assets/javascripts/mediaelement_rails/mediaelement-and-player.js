@@ -4277,7 +4277,7 @@ if (typeof jQuery != 'undefined') {
 			});
 
             //Keyboard input
-      mute.find('button').bind('focus', function () {
+            mute.find('button').bind('focus', function () {
 				volumeSlider.show();
 			});
 
@@ -4987,7 +4987,7 @@ if (typeof jQuery != 'undefined') {
 			player.captionsText = player.captions.find('.mejs-captions-text');
 			player.captionsButton =
 					$('<div class="mejs-button mejs-captions-button">'+
-						'<button type="button" aria-controls="' + t.id + '" title="' + t.options.tracksText + '" aria-label="' + t.options.tracksText + '"></button>'+
+						'<button type="button" class="fa fa-cc" aria-controls="' + t.id + '" title="' + t.options.tracksText + '" aria-label="' + t.options.tracksText + '"></button>'+
 						'<div class="mejs-captions-selector">'+
 							'<ul>'+
 								'<li>'+
@@ -5105,7 +5105,7 @@ if (typeof jQuery != 'undefined') {
 			t.container.on('controlsresize', function() {
 				t.adjustLanguageBox();
 			});
-			
+
 			// check for autoplay
 			if (player.node.getAttribute('autoplay') !== null) {
 				player.chapters.css('visibility','hidden');
@@ -5217,12 +5217,12 @@ if (typeof jQuery != 'undefined') {
 
 			t.adjustLanguageBox();
 		},
-		
+
 		removeTrackButton: function(lang) {
 			var t = this;
-			
+
 			t.captionsButton.find('input[value=' + lang + ']').closest('li').remove();
-			
+
 			t.adjustLanguageBox();
 		},
 
