@@ -49,14 +49,14 @@ module MediaelementRails
       # Update the vendored MediaElement.js
       run "git clone #{options[:git]} #{vendor_path}",    :capture => true unless File.directory? vendor_path
       run "cd #{vendor_path} && git fetch",  :capture => true
-      run "cd #{vendor_path} && git reset --hard origin/#{options[:tag]}",  :capture => true
       run "cd #{vendor_path} && git checkout #{options[:tag]}", :capture => true
+      run "cd #{vendor_path} && git reset --hard origin/#{options[:tag]}",  :capture => true
       run "cd #{vendor_path} && git pull origin #{options[:tag]}",  :capture => true
-      run "cd #{vendor_path}/src && grunt", :capture => true
+      run "cd #{vendor_path}/src && python Builder.py", :capture => true
 
       # Then copy the files we need to their correct locations
       UPDATE_FILES.each do |matcher, path|
-        Dir[File.join(vendor_path, "local-build", matcher)].each do |file|
+        Dir[File.join(vendor_path, "build", matcher)].each do |file|
           new_name = File.join assets_path, path, "mediaelement_rails", File.basename(file)
           new_name << ".erb" if file =~ /\.css$/
           copy_file file, new_name
