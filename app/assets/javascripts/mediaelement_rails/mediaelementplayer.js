@@ -2336,6 +2336,10 @@ if (typeof jQuery != 'undefined') {
 
 		tracksText: mejs.i18n.t('Captions/Subtitles'),
 
+		// By default, no WAI-ARIA live region - don't make a
+		// screen reader speak captions over an audio track.
+		tracksAriaLive: false,
+
 		// option to remove the [cc] button when no <track kind="subtitles"> are present
 		hideCaptionsButtonWhenEmpty: true,
 
@@ -2350,24 +2354,35 @@ if (typeof jQuery != 'undefined') {
 
 		hasChapters: false,
 
+		cleartracks: function(player, controls, layers, media){
+			if(player) {
+				if(player.captions) player.captions.remove();
+				if(player.chapters) player.chapters.remove();
+				if(player.captionsText) player.captionsText.remove();
+				if(player.captionsButton) player.captionsButton.hide();
+			}
+		},
 		buildtracks: function(player, controls, layers, media) {
-			if (player.tracks.length == 0)
+			if (player.tracks.length === 0)
 				return;
 
 			var t = this,
-				i,
-				options = '';
+				attr = t.options.tracksAriaLive ?
+					'role="log" aria-live="assertive" aria-atomic="false"' : '',
+				i;
 
 			if (t.domNode.textTracks) { // if browser will do native captions, prefer mejs captions, loop through tracks and hide
-				for (var i = t.domNode.textTracks.length - 1; i >= 0; i--) {
+				for (i = t.domNode.textTracks.length - 1; i >= 0; i--) {
 					t.domNode.textTracks[i].mode = "hidden";
 				}
 			}
+			t.cleartracks(player, controls, layers, media);
 			player.chapters =
 					$('<div class="mejs-chapters mejs-layer"></div>')
 						.prependTo(layers).hide();
 			player.captions =
-					$('<div class="mejs-captions-layer mejs-layer"><div class="mejs-captions-position mejs-captions-position-hover"><span class="mejs-captions-text"></span></div></div>')
+					$('<div class="mejs-captions-layer mejs-layer"><div class="mejs-captions-position mejs-captions-position-hover" ' +
+					attr + '><span class="mejs-captions-text"></span></div></div>')
 						.prependTo(layers).hide();
 			player.captionsText = player.captions.find('.mejs-captions-text');
 			player.captionsButton =
@@ -2396,25 +2411,27 @@ if (typeof jQuery != 'undefined') {
 			if (t.options.toggleCaptionsButtonWhenOnlyOne && subtitleCount == 1){
 				// click
 				player.captionsButton.on('click',function() {
-					if (player.selectedTrack == null) {
-						var lang = player.tracks[0].srclang;
+					if (player.selectedTrack === null) {
+						lang = player.tracks[0].srclang;
 					} else {
-						var lang = 'none';
+						lang = 'none';
 					}
 					player.setTrack(lang);
 				});
 			} else {
-				// hover
-				player.captionsButton.hover(function() {
+				// hover or keyboard focus
+				player.captionsButton.on( 'mouseenter focusin', function() {
 					$(this).find('.mejs-captions-selector').css('visibility','visible');
-				}, function() {
-					$(this).find('.mejs-captions-selector').css('visibility','hidden');
 				})
 
 				// handle clicks to the language radio buttons
 				.on('click','input[type=radio]',function() {
 					lang = this.value;
 					player.setTrack(lang);
+				});
+
+				player.captionsButton.on( 'mouseleave focusout', function() {
+					$(this).find('.mejs-captions-selector').css('visibility','hidden');
 				});
 
 			}
@@ -2441,8 +2458,6 @@ if (typeof jQuery != 'undefined') {
 			player.selectedTrack = null;
 			player.isLoadingTrack = false;
 
-
-
 			// add to list
 			for (i=0; i<player.tracks.length; i++) {
 				if (player.tracks[i].kind == 'subtitles') {
@@ -2453,12 +2468,11 @@ if (typeof jQuery != 'undefined') {
 			// start loading tracks
 			player.loadNextTrack();
 
-
 			media.addEventListener('timeupdate',function(e) {
 				player.displayCaptions();
 			}, false);
 
-			if (player.options.slidesSelector != '') {
+			if (player.options.slidesSelector !== '') {
 				player.slidesContainer = $(player.options.slidesSelector);
 
 				media.addEventListener('timeupdate',function(e) {
@@ -2488,9 +2502,13 @@ if (typeof jQuery != 'undefined') {
 					}
 				});
 
+			t.container.on('controlsresize', function() {
+				t.adjustLanguageBox();
+			});
+
 			// check for autoplay
 			if (player.node.getAttribute('autoplay') !== null) {
-				player.chapters.css('visibility','hidden');
+				player.chapters.css('visibility', 'hidden');
 			}
 		},
 
@@ -2505,8 +2523,8 @@ if (typeof jQuery != 'undefined') {
 			} else {
 				for (i=0; i<t.tracks.length; i++) {
 					if (t.tracks[i].srclang == lang) {
-						if (t.selectedTrack == null)
-						    t.captionsButton.addClass('mejs-captions-enabled');
+						if (t.selectedTrack === null)
+							t.captionsButton.addClass('mejs-captions-enabled');
 						t.selectedTrack = t.tracks[i];
 						t.captions.attr('lang', t.selectedTrack.srclang);
 						t.displayCaptions();
@@ -2539,8 +2557,6 @@ if (typeof jQuery != 'undefined') {
 
 					track.isLoaded = true;
 
-					// create button
-					//t.addTrackButton(track.srclang);
 					t.enableTrackButton(track.srclang, track.label);
 
 					t.loadNextTrack();
@@ -2557,7 +2573,7 @@ if (typeof jQuery != 'undefined') {
 					if (typeof d == "string" && (/<tt\s+xml/ig).exec(d)) {
 						track.entries = mejs.TrackFormatParser.dfxp.parse(d);
 					} else {
-						track.entries = mejs.TrackFormatParser.webvvt.parse(d);
+						track.entries = mejs.TrackFormatParser.webvtt.parse(d);
 					}
 
 					after();
@@ -2575,6 +2591,7 @@ if (typeof jQuery != 'undefined') {
 					}
 				},
 				error: function() {
+					t.removeTrackButton(track.srclang);
 					t.loadNextTrack();
 				}
 			});
@@ -2595,8 +2612,16 @@ if (typeof jQuery != 'undefined') {
 
 			// auto select
 			if (t.options.startLanguage == lang) {
-				$('#' + t.id + '_captions_' + lang).click();
+				$('#' + t.id + '_captions_' + lang).prop('checked', true).trigger('click');
 			}
+
+			t.adjustLanguageBox();
+		},
+
+		removeTrackButton: function(lang) {
+			var t = this;
+
+			t.captionsButton.find('input[value=' + lang + ']').closest('li').remove();
 
 			t.adjustLanguageBox();
 		},
@@ -2637,7 +2662,7 @@ if (typeof jQuery != 'undefined') {
 			// check if any subtitles
 			if (t.options.hideCaptionsButtonWhenEmpty) {
 				for (i=0; i<t.tracks.length; i++) {
-					if (t.tracks[i].kind == 'subtitles') {
+					if (t.tracks[i].kind == 'subtitles' && t.tracks[i].isLoaded) {
 						hasSubtitles = true;
 						break;
 					}
@@ -2660,10 +2685,11 @@ if (typeof jQuery != 'undefined') {
 				i,
 				track = t.selectedTrack;
 
-			if (track != null && track.isLoaded) {
+			if (track !== null && track.isLoaded) {
 				for (i=0; i<track.entries.times.length; i++) {
-					if (t.media.currentTime >= track.entries.times[i].start && t.media.currentTime <= track.entries.times[i].stop){
-						t.captionsText.html(track.entries.text[i]);
+					if (t.media.currentTime >= track.entries.times[i].start && t.media.currentTime <= track.entries.times[i].stop) {
+						// Set the line before the timecode as a class so the cue can be targeted if needed
+						t.captionsText.html(track.entries.text[i]).attr('class', 'mejs-captions-text ' + (track.entries.times[i].identifier || ''));
 						t.captions.show().height(0);
 						return; // exit out if one is visible;
 					}
@@ -2782,7 +2808,7 @@ if (typeof jQuery != 'undefined') {
 					'<div class="mejs-chapter" rel="' + chapters.entries.times[i].start + '" style="left: ' + usedPercent.toString() + '%;width: ' + percent.toString() + '%;">' +
 						'<div class="mejs-chapter-block' + ((i==chapters.entries.times.length-1) ? ' mejs-chapter-block-last' : '') + '">' +
 							'<span class="ch-title">' + chapters.entries.text[i] + '</span>' +
-							'<span class="ch-time">' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].start) + '&ndash;' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].stop) + '</span>' +
+							'<span class="ch-time">' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].start, t.options) + '&ndash;' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].stop, t.options) + '</span>' +
 						'</div>' +
 					'</div>'));
 				usedPercent += percent;
@@ -2818,7 +2844,7 @@ if (typeof jQuery != 'undefined') {
 			nl:'Dutch',
 			en:'English',
 			et:'Estonian',
-			tl:'Filipino',
+			fl:'Filipino',
 			fi:'Finnish',
 			fr:'French',
 			gl:'Galician',
@@ -2843,7 +2869,7 @@ if (typeof jQuery != 'undefined') {
 			fa:'Persian',
 			pl:'Polish',
 			pt:'Portuguese',
-			//'pt-pt':'Portuguese (Portugal)',
+			// 'pt-pt':'Portuguese (Portugal)',
 			ro:'Romanian',
 			ru:'Russian',
 			sr:'Serbian',
@@ -2863,7 +2889,7 @@ if (typeof jQuery != 'undefined') {
 	};
 
 	/*
-	Parses WebVVT format which should be formatted as
+	Parses WebVTT format which should be formatted as
 	================================
 	WEBVTT
 
@@ -2880,10 +2906,8 @@ if (typeof jQuery != 'undefined') {
 	Adapted from: http://www.delphiki.com/html5/playr
 	*/
 	mejs.TrackFormatParser = {
-		webvvt: {
-			// match start "chapter-" (or anythingelse)
-			pattern_identifier: /^([a-zA-z]+-)?[0-9]+$/,
-			pattern_timecode: /^([0-9]{2}:[0-9]{2}:[0-9]{2}([,.][0-9]{1,3})?) --\> ([0-9]{2}:[0-9]{2}:[0-9]{2}([,.][0-9]{3})?)(.*)$/,
+		webvtt: {
+			pattern_timecode: /^((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{1,3})?) --\> ((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{3})?)(.*)$/,
 
 			parse: function(trackText) {
 				var
@@ -2891,34 +2915,35 @@ if (typeof jQuery != 'undefined') {
 					lines = mejs.TrackFormatParser.split2(trackText, /\r?\n/),
 					entries = {text:[], times:[]},
 					timecode,
-					text;
+					text,
+					identifier;
 				for(; i<lines.length; i++) {
-					// check for the line number
-					if (this.pattern_identifier.exec(lines[i])){
-						// skip to the next line where the start --> end time code should be
-						i++;
-						timecode = this.pattern_timecode.exec(lines[i]);
+					timecode = this.pattern_timecode.exec(lines[i]);
 
-						if (timecode && i<lines.length){
-							i++;
-							// grab all the (possibly multi-line) text that follows
-							text = lines[i];
-							i++;
-							while(lines[i] !== '' && i<lines.length){
-								text = text + '\n' + lines[i];
-								i++;
-							}
-							text = $.trim(text).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' target='_blank'>$1</a>");
-							// Text is in a different array so I can use .join
-							entries.text.push(text);
-							entries.times.push(
-							{
-								start: (mejs.Utility.convertSMPTEtoSeconds(timecode[1]) == 0) ? 0.200 : mejs.Utility.convertSMPTEtoSeconds(timecode[1]),
-								stop: mejs.Utility.convertSMPTEtoSeconds(timecode[3]),
-								settings: timecode[5]
-							});
+					if (timecode && i<lines.length) {
+						if ((i - 1) >= 0 && lines[i - 1] !== '') {
+							identifier = lines[i - 1];
 						}
+						i++;
+						// grab all the (possibly multi-line) text that follows
+						text = lines[i];
+						i++;
+						while(lines[i] !== '' && i<lines.length){
+							text = text + '\n' + lines[i];
+							i++;
+						}
+						text = $.trim(text).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' target='_blank'>$1</a>");
+						// Text is in a different array so I can use .join
+						entries.text.push(text);
+						entries.times.push(
+						{
+							identifier: identifier,
+							start: (mejs.Utility.convertSMPTEtoSeconds(timecode[1]) === 0) ? 0.200 : mejs.Utility.convertSMPTEtoSeconds(timecode[1]),
+							stop: mejs.Utility.convertSMPTEtoSeconds(timecode[3]),
+							settings: timecode[5]
+						});
 					}
+					identifier = '';
 				}
 				return entries;
 			}
@@ -2933,8 +2958,6 @@ if (typeof jQuery != 'undefined') {
 					lines = container.find("p"),
 					styleNode = trackText.find("#" + container.attr("style")),
 					styles,
-					begin,
-					end,
 					text,
 					entries = {text:[], times:[]};
 
@@ -2967,11 +2990,11 @@ if (typeof jQuery != 'undefined') {
 						}
 					}
 					if (style) _temp_times.style = style;
-					if (_temp_times.start == 0) _temp_times.start = 0.200;
+					if (_temp_times.start === 0) _temp_times.start = 0.200;
 					entries.times.push(_temp_times);
 					text = $.trim(lines.eq(i).html()).replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' target='_blank'>$1</a>");
 					entries.text.push(text);
-					if (entries.times.start == 0) entries.times.start = 2;
+					if (entries.times.start === 0) entries.times.start = 2;
 				}
 				return entries;
 			}
@@ -3001,7 +3024,7 @@ if (typeof jQuery != 'undefined') {
 			}
 			parts.push(chunk);
 			return parts;
-		}
+		};
 	}
 
 })(mejs.$);
