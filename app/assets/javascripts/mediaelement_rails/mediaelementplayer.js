@@ -2662,7 +2662,7 @@ if (typeof jQuery != 'undefined') {
 			// check if any subtitles
 			if (t.options.hideCaptionsButtonWhenEmpty) {
 				for (i=0; i<t.tracks.length; i++) {
-					if (t.tracks[i].kind == 'subtitles' && t.tracks[i].isLoaded) {
+					if (t.tracks[i].kind == 'subtitles') {
 						hasSubtitles = true;
 						break;
 					}
