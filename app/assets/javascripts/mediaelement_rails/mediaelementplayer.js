@@ -873,7 +873,9 @@ if (typeof jQuery != 'undefined') {
 				total = t.controls.find('.mejs-time-total'),
 				current = t.controls.find('.mejs-time-current'),
 				loaded = t.controls.find('.mejs-time-loaded'),
-				others = rail.siblings();
+				others = rail.siblings(),
+				lastControl = others.last(),
+				lastControlPosition;
 
 
 			// allow the size to come from custom CSS
@@ -898,10 +900,22 @@ if (typeof jQuery != 'undefined') {
 				railWidth = t.controls.width() - usedWidth - (rail.outerWidth(true) - rail.width()) - 2;
 			}
 
-			// outer area
-			rail.width(railWidth);
-			// dark space
-			total.width(railWidth - (total.outerWidth(true) - total.width()));
+			// resize the rail,
+			// but then check if the last control (say, the fullscreen button) got pushed down
+			// this often happens when zoomed
+			do {
+				// outer area
+				rail.width(railWidth);
+				// dark space
+				total.width(railWidth - (total.outerWidth(true) - total.width()));
+
+				if (lastControl.css('position') != 'absolute') {
+					lastControlPosition = lastControl.length ? lastControl.position() : null;
+					railWidth--;
+				}
+			} while (lastControlPosition !== null && lastControlPosition.top > 0 && railWidth > 0);
+
+			t.container.trigger('controlsresize');
 
 			if (t.setProgressRail)
 				t.setProgressRail();
@@ -1486,6 +1500,10 @@ if (typeof jQuery != 'undefined') {
 				player.setCurrentRail(e);
 			}, false);
 			
+			t.container.on('controlsresize', function() {
+				player.setProgressRail();
+				player.setCurrentRail();
+			});
 			
 			// store for later use
 			t.loaded = loaded;
