@@ -1283,6 +1283,7 @@ mejs.HtmlMediaElementShim = {
 		if (playback.isVideo) {
 				htmlMediaElement.parentNode.insertBefore(container, htmlMediaElement);
 		} else {
+				container.style.opacity = 0;
 				document.body.insertBefore(container, document.body.childNodes[0]);
 		}
 
