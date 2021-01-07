@@ -1,5 +1,5 @@
 #  MediaelementRails #
-
+An easy mediaelementjs rails integration for asset pipeline enabled apps.
 This neat project brings the cool [MediaElement.js](http://mediaelementjs.com/) (HTML5/Flash/Silverlight video player) to the Rails asset pipeline. __*NOTE:*__ This gem requires jquery, which shouldn't be an issue.
 
 ## All you have to do is: ##
